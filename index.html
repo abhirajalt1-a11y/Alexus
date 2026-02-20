@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alexus | Learning Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF2B00;
+            --primary-dark: #d92300;
+            --secondary: #22d3ee;
+            --text-main: #f8f9fc;
+            --text-sub: #d1e8ff;
+            --glass: rgba(15, 20, 35, 0.68);
+            --border: rgba(255, 43, 0, 0.20);
+            --glow-orange: 0 0 18px rgba(255,43,0,0.60), 0 4px 24px rgba(0,0,0,0.75);
+            --ai-deep-blue: #0A192F;
+            --ai-blue-border: #1E3A8A;
+            --ai-blue-glow: 0 0 12px rgba(30,58,138,0.5);
+        }
+        body {
+            margin: 0;
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: #0a0e1f url('https://img.freepik.com/premium-photo/abstract-technology-background-with-geometric-texture-grid-pattern-your-graphic-design_120542-1888.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 70px 20px; text-align: center; }
+        h1 { font-size: 3.8rem; font-weight: 800; margin-bottom: 14px; color: #ffffff; text-shadow: var(--glow-orange); letter-spacing: -0.8px; }
+        .subtitle { color: var(--text-sub); font-size: 1.3rem; font-weight: 400; margin-bottom: 50px; text-shadow: 0 4px 14px rgba(0,0,0,0.95); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 32px; }
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 44px 32px;
+            transition: all 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+            color: var(--text-main);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .card:hover {
+            transform: translateY(-16px) scale(1.015);
+            border-color: var(--primary);
+            background: rgba(255,43,0,0.05);
+            box-shadow: var(--glow-orange), 0 28px 70px rgba(0,0,0,0.7);
+        }
+        .card h3, .card p { text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
+        .card i {
+            margin-bottom: 28px;
+            color: var(--primary);
+            filter: drop-shadow(0 0 14px rgba(255,43,0,0.65));
+            transition: transform 0.3s ease;
+        }
+        .card:hover i { transform: scale(1.15); }
+        .card a.internal-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        #content-page { display: none; animation: slideIn 0.6s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+        .select-box {
+            padding: 18px 30px;
+            border-radius: 16px;
+            background: rgba(15, 20, 35, 0.85);
+            color: #f8f9fc;
+            border: 1px solid rgba(255,43,0,0.30);
+            font-size: 1.2rem;
+            width: 340px;
+            margin: 28px auto;
+            backdrop-filter: blur(16px);
+            box-shadow: inset 0 3px 12px rgba(0,0,0,0.6);
+        }
+        .select-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255,43,0,0.28); }
+        .back-link {
+            color: #ff6b40;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 32px;
+            cursor: pointer;
+            text-shadow: 0 3px 12px rgba(0,0,0,0.85);
+        }
+        .back-link:hover { color: var(--primary); text-shadow: 0 0 16px rgba(255,43,0,0.75); }
+
+        /* AI Mini Chat - Deep Blue Theme */
+        .ai-mini-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+        .ai-circle-btn {
+            width: 54px;
+            height: 54px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.12);
+        }
+        .ai-circle-btn:hover { transform: scale(1.15); }
+        .ai-chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 320px;
+            height: 380px;
+            background: var(--ai-deep-blue);
+            border: 1px solid var(--ai-blue-border);
+            border-radius: 16px;
+            box-shadow: var(--ai-blue-glow), 0 10px 40px rgba(0,0,0,0.7);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .ai-header {
+            background: var(--ai-deep-blue);
+            padding: 12px 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+        .ai-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .ai-close {
+            margin-left: auto;
+            cursor: pointer;
+            font-size: 1.4rem;
+            opacity: 0.9;
+        }
+        .ai-close:hover { opacity: 1; }
+        .ai-body {
+            flex: 1;
+            padding: 16px;
+            font-size: 0.95rem;
+            color: #d1e8ff;
+            overflow-y: auto;
+        }
+        .ai-input {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(30,58,138,0.5);
+            display: flex;
+        }
+        .ai-input input {
+            background: rgba(15, 30, 60, 0.8);
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        .ai-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30,58,138,0.5);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="home-page">
+        <h1>Pick a Subject To Learn</h1>
+        <p class="subtitle">Select your field of study to access high-quality resources</p>
+   
+        <div class="grid">
+            <a href="?subject=Maths" class="card" onclick="route(event, 'Maths')">
+                <i data-lucide="binary" size="48"></i>
+                <h3>Maths</h3>
+            </a>
+            <a href="?subject=Science" class="card" onclick="route(event, 'Science')">
+                <i data-lucide="flask-conical" size="48"></i>
+                <h3>Science</h3>
+                <p style="font-size: 0.9rem;">Chemistry • Physics • Biology</p>
+            </a>
+            <a href="?subject=Social" class="card" onclick="route(event, 'Social')">
+                <i data-lucide="globe" size="48"></i>
+                <h3>Social Studies</h3>
+            </a>
+            <a href="?subject=SL" class="card" onclick="route(event, 'SL')">
+                <i data-lucide="languages" size="48"></i>
+                <h3>Second Language</h3>
+            </a>
+            <a href="?subject=English" class="card" onclick="route(event, 'English')">
+                <i data-lucide="book-open" size="48"></i>
+                <h3>English</h3>
+            </a>
+        </div>
+    </div>
+
+    <div id="content-page">
+        <div class="back-link" onclick="window.location.href='index.html'"><i data-lucide="arrow-left"></i> Change Subject</div>
+        <h1 id="subject-title">Subject</h1>
+   
+        <div id="class-step">
+            <p class="subtitle">Step 1: Select your grade</p>
+            <select class="select-box" id="gradeSelect" onchange="showResources()">
+                <option value="">Choose Class...</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+                <option value="11">Class 11</option>
+                <option value="12">Class 12</option>
+            </select>
+        </div>
+
+        <div id="resource-step" style="display:none">
+            <p class="subtitle">Step 2: Access your materials</p>
+            <div class="grid">
+                <a id="pyqLink" href="#" class="card internal-link" target="_blank">
+                    <h3>PYQs</h3>
+                    <p>Past Exams / Sample Papers</p>
+                </a>
+                <a id="syllabusLink" href="#" class="card internal-link" target="_blank">
+                    <h3>Syllabus</h3>
+                    <p>Curriculum 2025-26</p>
+                </a>
+                <!-- Explanations now clickable -->
+                <a id="explanationsLink" href="#" class="card internal-link" target="_blank">
+                    <h3>Explanations</h3>
+                    <p>Chapter-wise Videos</p>
+                </a>
+                <div class="card">
+                    <h3>Other Options</h3>
+                    <p>External Links</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Small AI Button + Deep Blue Chat -->
+<div class="ai-mini-container">
+    <div class="ai-circle-btn" onclick="toggleMiniAI()">
+        <i data-lucide="sparkles" color="white" size="24"></i>
+    </div>
+
+    <div class="ai-chat-window" id="miniAIChat">
+        <div class="ai-header">
+            <img class="ai-avatar" src="https://cdn-icons-png.flaticon.com/512/1034/10349169.png" alt="Alexus">
+            <span>Alexus</span>
+            <span class="ai-close" onclick="toggleMiniAI()">×</span>
+        </div>
+        <div class="ai-body" id="miniAIBody">
+            <p>Hi Abhiraj! I'm Alexus.<br>Ask me simple study questions!</p>
+        </div>
+        <div class="ai-input">
+            <input type="text" placeholder="Ask anything study-related..." id="aiInput" onkeypress="if(event.key === 'Enter') sendMiniMsg()">
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // Toggle mini AI
+    function toggleMiniAI() {
+        const chat = document.getElementById('miniAIChat');
+        chat.style.display = (chat.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    // Simple but robust AI response
+    function sendMiniMsg() {
+        const input = document.getElementById('aiInput');
+        let msg = input.value.trim();
+        if (!msg) return;
+
+        const body = document.getElementById('miniAIBody');
+        body.innerHTML += `<p style="text-align:right; color:#FF2B00"><b>You:</b> ${msg}</p>`;
+
+        // Normalize message
+        msg = msg.toLowerCase()
+                 .replace(/[^\w\s]/g, '')   // remove punctuation
+                 .replace(/\s+/g, ' ')      // normalize spaces
+                 .trim();
+
+        let answer = "Sorry, I'm still learning — try a simple study question like 'what is photosynthesis' or 'capital of India'.";
+
+        // Spell correction + more flexible matching
+        const corrections = {
+            'photosyntesis': 'photosynthesis', 'photosyntheis': 'photosynthesis', 'photosyntasis': 'photosynthesis',
+            'pythagoras theorm': 'pythagoras theorem', 'pythagoras therom': 'pythagoras theorem', 'pythagorus': 'pythagoras',
+            'democrasy': 'democracy', 'democracyy': 'democracy',
+            'capitol': 'capital', 'capitol of india': 'capital of india',
+            'triangel': 'triangle', 'triangel types': 'triangle',
+            'presedent': 'president', 'presidant': 'president'
+        };
+
+        let corrected = msg;
+        Object.keys(corrections).forEach(wrong => {
+            if (corrected.includes(wrong)) corrected = corrected.replace(wrong, corrections[wrong]);
+        });
+
+        // Matching logic (more lenient)
+        if (corrected.includes('photosynthesis')) {
+            answer = "Photosynthesis is how green plants make their own food. They use sunlight, carbon dioxide from air, and water from soil to produce glucose (food) and oxygen. Equation: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂ (in the presence of chlorophyll and sunlight).";
+        }
+        else if (corrected.includes('democracy')) {
+            answer = "Democracy means 'rule by the people'. Citizens vote to choose leaders and decide laws. India is the world's largest democracy.";
+        }
+        else if (corrected.includes('triangle') || corrected.includes('triangles')) {
+            answer = "Triangles are classified by sides: Equilateral (all sides equal), Isosceles (two sides equal), Scalene (all sides different). By angles: Acute (all <90°), Right (one =90°), Obtuse (one >90°).";
+        }
+        else if (corrected.includes('capital of india')) {
+            answer = "The capital city of India is New Delhi.";
+        }
+        else if (corrected.includes('capital of karnataka')) {
+            answer = "The capital of Karnataka is Bengaluru (also called Bangalore).";
+        }
+        else if (corrected.includes('pythagoras') || corrected.includes('theorem')) {
+            answer = "Pythagoras theorem: In a right-angled triangle, the square of the hypotenuse (longest side) equals the sum of squares of the other two sides. Formula: a² + b² = c².";
+        }
+        else if (corrected.includes('president of india')) {
+            answer = "As of 2026, the President of India is Droupadi Murmu.";
+        }
+        else if (corrected.includes('gravity')) {
+            answer = "Gravity is the force that pulls objects toward each other. On Earth, it causes things to fall and keeps us on the ground. Acceleration due to gravity ≈ 9.8 m/s².";
+        }
+        else if (corrected.includes('water') && corrected.includes('formula')) {
+            answer = "The chemical formula of water is H₂O — two hydrogen atoms bonded to one oxygen atom.";
+        }
+        else if (corrected.includes('hello') || corrected.includes('hi') || corrected.includes('hey')) {
+            answer = "Hey Abhiraj! What's your question today? 😊";
+        }
+
+        setTimeout(() => {
+            body.innerHTML += `<p><b>Alexus:</b> ${answer}</p>`;
+            body.scrollTop = body.scrollHeight;
+        }, 900);
+
+        input.value = "";
+    }
+
+    // ────────────────────────────────────────────────
+    function route(e, subject) {
+        e.preventDefault();
+        const newUrl = window.location.pathname + '?subject=' + subject;
+        window.history.pushState({path:newUrl}, '', newUrl);
+        checkURL();
+    }
+
+    function checkURL() {
+        const params = new URLSearchParams(window.location.search);
+        const sub = params.get('subject');
+        if (sub) {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('content-page').style.display = 'block';
+            document.getElementById('subject-title').innerText = sub;
+            document.getElementById('class-step').style.display = 'block';
+            document.getElementById('resource-step').style.display = 'none';
+        } else {
+            document.getElementById('home-page').style.display = 'block';
+            document.getElementById('content-page').style.display = 'none';
+        }
+    }
+
+    function showResources() {
+        const grade = document.getElementById('gradeSelect').value;
+        if (grade !== "") {
+            document.getElementById('class-step').style.display = 'none';
+            document.getElementById('resource-step').style.display = 'grid';
+
+            const subject = document.getElementById('subject-title').innerText.trim();
+            const pyqLink        = document.getElementById('pyqLink');
+            const syllabusLink   = document.getElementById('syllabusLink');
+            const explanationsLink = document.getElementById('explanationsLink');
+
+            if (subject === 'Maths') {
+                let pyqUrl = '#', syllabusUrl = '#', explUrl = '#';
+
+                // PYQs
+                if (grade === '9') pyqUrl = 'https://www.selfstudys.com/books/cbse-sample-paper/english/9th/mathematics/mathematics-2026-set-4/1183417';
+                else if (grade === '10') pyqUrl = 'https://www.selfstudys.com/books/cbse-sample-paper/english/10th/mathematics/maths-standard-2026-set-1/1183154';
+                else if (grade === '11') pyqUrl = 'https://www.selfstudys.com/books/cbse-sample-paper/english/11th/mathematics/mathematics-2026-set-1/1185264';
+                else if (grade === '12') pyqUrl = 'https://www.selfstudys.com/books/cbse-sample-paper/english/12th/mathematics/mathematics-2026-set-1/1183746';
+                pyqLink.href = pyqUrl;
+                pyqLink.style.cursor = pyqUrl !== '#' ? 'pointer' : 'default';
+
+                // Syllabus
+                syllabusUrl = (grade === '9' || grade === '10')
+                    ? 'https://cbseacademic.nic.in/web_material/CurriculumMain26/Sec/Maths_Sec_2025-26.pdf'
+                    : 'https://cbseacademic.nic.in/web_material/CurriculumMain26/SrSec/Maths_SrSec_2025-26.pdf';
+                syllabusLink.href = syllabusUrl;
+                syllabusLink.style.cursor = syllabusUrl !== '#' ? 'pointer' : 'default';
+
+                // Explanations (Khan Academy video playlists)
+                if (grade === '9' || grade === '10') {
+                    explUrl = 'https://www.khanacademy.org/math/in-class-9-math-foundations';
+                } else if (grade === '11' || grade === '12') {
+                    explUrl = 'https://www.khanacademy.org/math/in-class-11-math-cbse';
+                }
+                explanationsLink.href = explUrl;
+                explanationsLink.style.cursor = explUrl !== '#' ? 'pointer' : 'default';
+            } else {
+                pyqLink.href = '#'; pyqLink.style.cursor = 'default';
+                syllabusLink.href = '#'; syllabusLink.style.cursor = 'default';
+                explanationsLink.href = '#'; explanationsLink.style.cursor = 'default';
+            }
+        }
+    }
+
+    window.onload = checkURL;
+</script>
+</body>
+</html>
